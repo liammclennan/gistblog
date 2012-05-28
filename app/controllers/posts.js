@@ -1,5 +1,7 @@
 var request = require('request'),
-  _ = require('underscore');
+  _ = require('underscore'),
+  lastGet = new Date(2000,1,1),
+  cache;
 
 var Posts = function () {
   this.respondsWith = ['html', 'json', 'xml', 'js', 'txt'];
@@ -50,9 +52,20 @@ var Posts = function () {
   };
 
   function getGists(successCallback, errorCallback, app) {
-    var gistListUrl = 'http://gist.github.com/api/v1/json/gists/liammclennan';
+    var gistListUrl = 'http://gist.github.com/api/v1/json/gists/liammclennan',
+      age = (new Date() - lastGet) / 60000;
+
+    console.log(age);
+    if (age < 5) {
+      successCallback(app, cache);
+      return undefined;
+    } 
+
     request({ url: gistListUrl, json: true }, function (error, response, body) {
+      console.log('get from github');
       if (!error && response.statusCode == 200) {
+        cache = body;
+        lastGet = new Date();
         successCallback(app, body);
       } else {
         errorCallback(app, body, response);
