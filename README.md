@@ -9,7 +9,7 @@ To run:
 
 1. install [geddy](http://geddyjs.org/)
 
-```
+```cli
     npm install -g geddy
 ```    
 
