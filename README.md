@@ -9,8 +9,12 @@ To run:
 
 1. install [geddy](http://geddyjs.org/)
 
+```
     npm install -g geddy
-    
+```    
+
 1. start gistblog
 
+```
     geddy
+```
