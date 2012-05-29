@@ -4,7 +4,11 @@ var request = require('request'),
   cache;
 
 var Posts = function () {
-  this.respondsWith = ['html', 'json', 'xml', 'js', 'txt'];
+  this.respondsWith = ['html'];
+
+  this.author = function (req, resp, params) {  
+    this.index(req, resp, params);
+  };
 
   this.index = function (req, resp, params) {
     getGists(onGistsRetrieved, onErrorRetrievingGists, this);

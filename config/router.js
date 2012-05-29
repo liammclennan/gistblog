@@ -18,7 +18,7 @@
 
 
 var router = new geddy.RegExpRouter();
-router.match('/').to({controller: 'Main', action: 'index'});
+router.match('/').to({controller: 'Posts', action: 'index'});
 
 // Basic routes
 // router.match('/moving/pictures/:id').to(
