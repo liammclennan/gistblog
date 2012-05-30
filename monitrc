@@ -1,0 +1,10 @@
+#!monit
+set logfile /var/log/monit.log
+
+check process nodejs with pidfile "/var/run/gistblog.pid"
+    start program = "/sbin/start gistblog"
+    stop program  = "/sbin/stop gistblog"
+    if failed port 80 protocol HTTP
+        request /
+        with timeout 10 seconds
+        then restart
