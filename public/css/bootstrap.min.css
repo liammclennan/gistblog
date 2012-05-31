@@ -608,3 +608,10 @@ a.thumbnail:hover{border-color:#0088cc;-webkit-box-shadow:0 1px 4px rgba(0, 105,
 .hide{display:none;}
 .show{display:block;}
 .invisible{visibility:hidden;}
+
+.don {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index:-1;
+}

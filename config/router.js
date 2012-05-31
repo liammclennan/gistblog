@@ -19,6 +19,7 @@
 
 var router = new geddy.RegExpRouter();
 router.match('/').to({controller: 'Posts', action: 'index'});
+router.match('/about').to({controller: 'About', action: 'index'});
 
 // Basic routes
 // router.match('/moving/pictures/:id').to(
@@ -32,6 +33,6 @@ router.match('/').to({controller: 'Posts', action: 'index'});
 // Resource-based routes
 // router.resource('hemispheres');
 
-router.resource('posts');
+//router.resource('posts');
 exports.router = router;
 
