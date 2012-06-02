@@ -10,7 +10,7 @@ script
 
     cd /home/liam/apps/gistblog
     echo $$ > /var/run/gistblog.pid
-    exec sudo -u liam /usr/local/bin/node /usr/local/lib/node_modules/geddy/bin/cli.js -p 3000 >> /var/log/gistblog.sys.log 2>&1
+    exec sudo -u liam /usr/local/bin/node /usr/local/lib/node_modules/geddy/bin/cli.js -p 3000 -e production >> /var/log/gistblog.sys.log 2>&1
 end script
 
 pre-start script
