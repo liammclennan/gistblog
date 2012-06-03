@@ -19,6 +19,8 @@
 
 var router = new geddy.RegExpRouter();
 router.match('/').to({controller: 'Posts', action: 'index'});
+router.match('/feed').to({controller: 'Posts', action: 'feed'});
+router.match('/feed.json').to({controller: 'Posts', action: 'feed'});
 router.match('/about').to({controller: 'About', action: 'index'});
 
 // Basic routes

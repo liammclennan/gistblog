@@ -4,10 +4,41 @@ var request = require('request'),
   cache;
 
 var Posts = function () {
-  this.respondsWith = ['html'];
+  this.respondsWith = ['html','atom', 'json'];
 
-  this.author = function (req, resp, params) {  
-    this.index(req, resp, params);
+  this.feed = function (req, resp, params) {  
+    getGists(onGistsRetrieved, onErrorRetrievingGists, this);
+
+    function onGistsRetrieved(app, body) {
+      var feed = {
+        gists: _.chain(body.gists)
+          .filter(isBlogGist) 
+          .map(toViewModel)
+          .sortBy(date)
+          .value().reverse()
+      };
+
+      //app.respond('<feed><title>Example feed</title></feed>', {
+      app.respond(template, {
+        format: 'txt'
+      });    
+
+      var template = "<feed> \n        <title>Example Feed</title>\n        <subtitle>A subtitle.</subtitle>\n               \n        <entry>\n                <title>Atom-Powered Robots Run Amok</title>\n                <summary>Some text.</summary>\n                <author>\n                      <name>John Doe</name>\n                      <email>johndoe.example.com</email>\n                </author>\n        </entry>\n \n</feed>";
+
+    }
+
+    function onErrorRetrievingGists(app, body, response) {
+      app.respond({
+        gists: [{
+          id: 0,
+          description: 'Github is broken', 
+          filename: '',
+          created_at: new Date(),
+          url: 'https://gist.github.com/'
+        }]
+      });   
+    }
+
   };
 
   this.index = function (req, resp, params) {
@@ -35,24 +66,6 @@ var Posts = function () {
       });   
     }
 
-    function isBlogGist(gist) {
-      return /blog_.+\.md/.test(gist.files[0]);
-    }
-
-    function toViewModel(gist) {
-      return { 
-        id: gist.repo,
-        description: gist.description, 
-        filename: gist.files[0],
-        created_at: new Date(gist.created_at),
-        url: 'https://gist.github.com/' + gist.repo
-      };
-    }
-
-    function date(gist) {
-      return gist.created_at;
-    }
-
   };
 
   function getGists(successCallback, errorCallback, app) {
@@ -76,6 +89,24 @@ var Posts = function () {
       }
     });
   }
+
+  function isBlogGist(gist) {
+      return /blog_.+\.md/.test(gist.files[0]);
+    }
+
+    function toViewModel(gist) {
+      return { 
+        id: gist.repo,
+        description: gist.description, 
+        filename: gist.files[0],
+        created_at: new Date(gist.created_at),
+        url: 'https://gist.github.com/' + gist.repo
+      };
+    }
+
+    function date(gist) {
+      return gist.created_at;
+    }
 
 };
 
