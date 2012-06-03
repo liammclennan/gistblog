@@ -1,8 +1,3 @@
-var request = require('request'),
-  _ = require('underscore'),
-  lastGet = new Date(2000,1,1),
-  cache;
-
 var About = function () {
   this.respondsWith = ['html'];
 
