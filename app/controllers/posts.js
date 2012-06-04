@@ -31,7 +31,7 @@ var Posts = function () {
       });    
 
       function toEntryNode(gist) {
-        return '<entry><title>' + gist.description + '</title><link href="https://gist.github.com/' + gist.repo + '" /></entry>';
+        return '<entry><title>' + gist.description + '</title><link href="' + gist.url + '" /></entry>';
       }
     }
   };
