@@ -7,7 +7,7 @@ var Posts = function () {
   this.respondsWith = ['html','atom', 'json'];
 
   this.feed = function (req, resp, params) {  
-    getGists(onGistsRetrieved, onErrorRetrievingGists, this);
+    getGists(onGistsRetrieved, function () {}, this);
 
     function onGistsRetrieved(app, body) {
       var feed = {
@@ -18,27 +18,22 @@ var Posts = function () {
           .value().reverse()
       };
 
-      //app.respond('<feed><title>Example feed</title></feed>', {
-      app.respond(template, {
-        format: 'txt'
+      feed.toXml = function () {
+        var response = '<feed xmlns="http://www.w3.org/2005/Atom"><title>Withouttheloop.com</title>';
+        _(this.gists).each(function (gist) {
+          response += toEntryNode(gist);
+        });
+        return response + '</feed>';
+      };
+
+      app.respond(feed, {
+        format: 'xml'
       });    
 
-      var template = "<feed> \n        <title>Example Feed</title>\n        <subtitle>A subtitle.</subtitle>\n               \n        <entry>\n                <title>Atom-Powered Robots Run Amok</title>\n                <summary>Some text.</summary>\n                <author>\n                      <name>John Doe</name>\n                      <email>johndoe.example.com</email>\n                </author>\n        </entry>\n \n</feed>";
-
+      function toEntryNode(gist) {
+        return '<entry><title>' + gist.description + '</title><link href="https://gist.github.com/' + gist.repo + '" /></entry>';
+      }
     }
-
-    function onErrorRetrievingGists(app, body, response) {
-      app.respond({
-        gists: [{
-          id: 0,
-          description: 'Github is broken', 
-          filename: '',
-          created_at: new Date(),
-          url: 'https://gist.github.com/'
-        }]
-      });   
-    }
-
   };
 
   this.index = function (req, resp, params) {
