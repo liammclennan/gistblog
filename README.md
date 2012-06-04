@@ -1,7 +1,7 @@
 Gistblog
 ========
 
-Gistblog is a simple blog engine based on github gists.
+Gistblog is a [simple blog engine based on github gists](https://gist.github.com/2821259).
 
 To run:
 
