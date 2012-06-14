@@ -2,6 +2,7 @@
 
 <div class="page-header well">
 	<h1><a href=<%= gist.url %>><%= gist.description %></a></h1>
+	<p>comments: <%= gist.comments > 0 ? gist.comments : 'None yet' %></p>
 </div>
 
 <% } %>

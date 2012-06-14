@@ -84,7 +84,8 @@ var Posts = function () {
       id: gist.id,
       description: gist.description, 
       created_at: new Date(gist.created_at),
-      url: 'https://gist.github.com/' + gist.id
+      url: 'https://gist.github.com/' + gist.id,
+      comments: gist.comments
     };
   }
 
