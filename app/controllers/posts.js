@@ -85,7 +85,7 @@ var Posts = function () {
       description: gist.description, 
       created_at: new Date(gist.created_at),
       url: 'https://gist.github.com/' + gist.id,
-      comments: gist.comments
+      commentsSummaryText: gist.comments > 0 ? gist.comments + ' comments' : 'no comments yet', 
     };
   }
 
