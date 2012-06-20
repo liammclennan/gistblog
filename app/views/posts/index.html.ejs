@@ -2,7 +2,14 @@
 
 <div class="page-header well">
 	<h1><a href=<%= gist.url %>><%= gist.description %></a></h1>
-	<p>comments: <%= gist.comments > 0 ? gist.comments : 'None yet' %></p>
+	<span class="muted">
+		<i class="icon-time"></i>
+		<%= gist.created_at.toDateString() %>
+	</span>
+	<span class="muted">
+		<i class="icon-comment"></i>
+		<%= gist.commentsSummaryText %>
+	</span>
 </div>
 
 <% } %>
