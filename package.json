@@ -1,0 +1,23 @@
+{
+  "author": "Liam McLennan <liam.mclennan@gmail.com> (http://withouttheloop.com)",
+  "name": "gistblog",
+  "description": "Blog Engine",
+  "version": "0.0.1",
+  "repository": {
+    "url": "git@github.com:liammclennan/gistblog"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "dependencies": {
+    "underscore": "*",
+    "mocha": "*",
+    "should": "*",
+    "request": "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
