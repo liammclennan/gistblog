@@ -13,7 +13,8 @@
     "underscore": "*",
     "mocha": "*",
     "should": "*",
-    "request": "*"
+    "request": "*",
+    "node-markdown": "*"
   },
   "devDependencies": {},
   "optionalDependencies": {},
