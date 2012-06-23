@@ -1,5 +1,7 @@
 var request = require('request'),
   _ = require('underscore'),
+  gist = require('../../lib/gist'),
+  markdown = require('../../lib/markdown'),
   lastGet = new Date(2000,1,1),
   cache;
 
@@ -80,12 +82,14 @@ var Posts = function () {
   } 
 
   function toViewModel(gist) {
+    var firstFile = gist.files[_(gist.files).keys()[0]];
     return { 
       id: gist.id,
       description: gist.description, 
       created_at: new Date(gist.created_at),
       url: 'https://gist.github.com/' + gist.id,
       commentsSummaryText: gist.comments > 0 ? gist.comments + ' comments' : 'no comments yet', 
+      raw_url: firstFile.raw_url
     };
   }
 
