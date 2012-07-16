@@ -22,9 +22,20 @@ var Posts = function () {
       };
 
       feed.toXml = function () {
-        var response = '<feed xmlns="http://www.w3.org/2005/Atom"><title>Withouttheloop.com</title>';
+
+        var lastUpdated = _.chain(this.gists)
+          .max(function (entry) { return entry.updated_at; })
+          .value();
+
+        var response = '<?xml version="1.0" encoding="utf-8"?>\n' +
+          '<feed xmlns="http://www.w3.org/2005/Atom"><title>Withouttheloop.com</title>\n' +
+          '<id>http://withouttheloop.com/</id>\n' +
+          '<link rel="self" href="http://withouttheloop.com/feed" />\n' +
+          '<updated>' + new Date().toJSON() + '</updated>'; // TODO: how to fix this?
+
         _(this.gists).each(function (gist) {
           response += toEntryNode(gist);
+          response += '\n';
         });
         return response + '</feed>';
       };
@@ -34,11 +45,13 @@ var Posts = function () {
       });
 
       function toEntryNode(gistEntry) {
-        return '<entry><title>' + gistEntry.description + '</title>' +
-          '<link href="' + gistEntry.url + '" />' +
-          '<content type="html"><![CDATA[' + gistEntry.content_html + ']]></content>' +
+        return '\n<entry>\n<title>' + gistEntry.description + '</title>' +
+          '<link  href="' + gistEntry.url + '" />\n' +
+          '<id>' + gistEntry.url + '</id>\n' +
+          '<content type="html"><![CDATA[' + gistEntry.content_html + ']]></content>\n' +
+          '<updated>' + gistEntry.updated_at.toJSON() + '</updated>\n' +
           '<author><name>Liam McLennan</name></author>' +
-          '</entry>';
+          '</entry>\n';
       }
     }
   };
@@ -120,6 +133,7 @@ var Posts = function () {
       id: gist.id,
       description: gist.description, 
       created_at: new Date(gist.created_at),
+      updated_at: new Date(gist.updated_at),
       url: 'https://gist.github.com/' + gist.id,
       commentsSummaryText: gist.comments > 0 ? gist.comments + ' comments' : 'no comments yet', 
       content_html: gist.content_html,
