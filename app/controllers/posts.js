@@ -3,6 +3,7 @@ var request = require('request'),
   gist = require('../../lib/gist'),
   markdown = require('../../lib/markdown'),
   lastGet = new Date(2000,1,1),
+  async = require('async'),
   cache;
 
 var Posts = function () {
@@ -14,7 +15,7 @@ var Posts = function () {
     function onGistsRetrieved(app, body) {
       var feed = {
         gists: _.chain(body)
-          .filter(isBlogGist) 
+          .filter(isBlogGist)
           .map(toViewModel)
           .sortBy(date)
           .value().reverse()
@@ -30,10 +31,14 @@ var Posts = function () {
 
       app.respond(feed, {
         format: 'xml'
-      });    
+      });
 
-      function toEntryNode(gist) {
-        return '<entry><title>' + gist.description + '</title><link href="' + gist.url + '" /></entry>';
+      function toEntryNode(gistEntry) {
+        return '<entry><title>' + gistEntry.description + '</title>' +
+          '<link href="' + gistEntry.url + '" />' +
+          '<content type="html"><![CDATA[' + gistEntry.content_html + ']]></content>' +
+          '<author><name>Liam McLennan</name></author>' +
+          '</entry>';
       }
     }
   };
@@ -67,8 +72,36 @@ var Posts = function () {
       console.log('get from github');
       if (!error && response.statusCode == 200) {
         cache = body;
-        lastGet = new Date();
-        successCallback(app, body);
+
+        // NOTE: the two arrays must match elements by index, exactly
+        var cacheBlogItemArray = _.chain(cache).filter(isBlogGist).toArray().value();
+        console.log('cache item array count %s', cacheBlogItemArray.length);
+        var asyncTasks = _.chain(body)
+          .filter(isBlogGist)
+          .map(function (rawGist) { return rawGist.files[_(rawGist.files).keys()[0]].raw_url; })
+          .map(function (raw_url) { return async.apply(gist.read, { raw_url: raw_url }); })
+          .toArray()
+          .value();
+
+        console.log('getting raw markdown for each blog gist');
+        async.parallel(asyncTasks, function onGotRawMarkdown(err, items) {
+          if (err) {
+            console.log("LOG: failed to get raw markdown, using cache. error = %j, items = %j", err);
+            successCallback(app, cache);
+          }
+          else {
+
+            // put the markdown back into the correct items (the cached copy)
+            // since async will give us the items in the correct order, we can
+            // can use the index to put the HTML content back into the cached item
+            _.chain(items).toArray().each(function (content_md, index) {
+              cacheBlogItemArray[index].content_html = markdown.convert(content_md);
+            });
+
+            lastGet = new Date();
+            successCallback(app, body);
+          }
+        });
       } else {
         console.log("LOG: failed to get gists from github. Using cache.");
         successCallback(app, cache);
@@ -89,6 +122,7 @@ var Posts = function () {
       created_at: new Date(gist.created_at),
       url: 'https://gist.github.com/' + gist.id,
       commentsSummaryText: gist.comments > 0 ? gist.comments + ' comments' : 'no comments yet', 
+      content_html: gist.content_html,
       raw_url: firstFile.raw_url
     };
   }
