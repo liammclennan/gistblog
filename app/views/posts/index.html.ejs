@@ -7,11 +7,16 @@
 		<%= gist.created_at.toDateString() %>
 	</span>
 	<span class="muted">
-		<i class="icon-comment"></i>
-		<%= gist.commentsSummaryText %>
+		<a href=<%= gist.url %>>
+			<i class="icon-comment"></i>
+			<%= gist.commentsSummaryText %>
+		</a>
 	</span>
 	<div class="blog-post-content">
 		<%- gist.content_html %>
+	</div>
+	<div>
+		<a href=<%= gist.url %>>Comment</a>
 	</div>
 </div>
 
