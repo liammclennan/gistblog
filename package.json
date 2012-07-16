@@ -14,7 +14,8 @@
     "mocha": "*",
     "should": "*",
     "request": "*",
-    "node-markdown": "*"
+    "node-markdown": "*",
+    "async": "*"
   },
   "devDependencies": {},
   "optionalDependencies": {},
