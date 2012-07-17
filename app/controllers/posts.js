@@ -22,9 +22,20 @@ var Posts = function () {
       };
 
       feed.toXml = function () {
-        var response = '<feed xmlns="http://www.w3.org/2005/Atom"><title>Withouttheloop.com</title>';
+
+        var lastUpdated = _.chain(this.gists)
+          .max(function (entry) { return entry.updated_at; })
+          .value();
+
+        var response = '<?xml version="1.0" encoding="utf-8"?>\n' +
+          '<feed xmlns="http://www.w3.org/2005/Atom"><title>Withouttheloop.com</title>\n' +
+          '<id>http://withouttheloop.com/</id>\n' +
+          '<link rel="self" href="http://withouttheloop.com/feed" />\n' +
+          '<updated>' + lastUpdated.updated_at.toJSON() + '</updated>';
+
         _(this.gists).each(function (gist) {
           response += toEntryNode(gist);
+          response += '\n';
         });
         return response + '</feed>';
       };
@@ -34,11 +45,13 @@ var Posts = function () {
       });
 
       function toEntryNode(gistEntry) {
-        return '<entry><title>' + gistEntry.description + '</title>' +
-          '<link href="' + gistEntry.url + '" />' +
-          '<content type="html"><![CDATA[' + gistEntry.content_html + ']]></content>' +
+        return '\n<entry>\n<title>' + gistEntry.description + '</title>' +
+          '<link  href="' + gistEntry.url + '" />\n' +
+          '<id>' + gistEntry.url + '</id>\n' +
+          '<content type="html"><![CDATA[' + gistEntry.content_html + ']]></content>\n' +
+          '<updated>' + gistEntry.updated_at.toJSON() + '</updated>\n' +
           '<author><name>Liam McLennan</name></author>' +
-          '</entry>';
+          '</entry>\n';
       }
     }
   };
@@ -84,23 +97,35 @@ var Posts = function () {
           .value();
 
         console.log('getting raw markdown for each blog gist');
-        async.parallel(asyncTasks, function onGotRawMarkdown(err, items) {
+        async.parallel(asyncTasks, function onGotRawMarkdown(err, rawMarkdownItems) {
           if (err) {
-            console.log("LOG: failed to get raw markdown, using cache. error = %j, items = %j", err);
-            successCallback(app, cache);
+            console.log("LOG: failed to get raw markdown, using cache. error = %j", err);
+            return successCallback(app, cache);
           }
-          else {
 
-            // put the markdown back into the correct items (the cached copy)
+          var convertMarkdownAsyncTasks = _.map(rawMarkdownItems, function (rawMarkdown) {
+            return async.apply(markdown.convertViaGithub, rawMarkdown);
+          });
+
+          // use GitHub to convert the markdown to HTML
+          console.log('converting raw markdown to html');
+          async.parallel(convertMarkdownAsyncTasks, function (err, htmlItems) {
+            if (err) {
+              console.log("LOG: failed to convert markdown via github. error = %s", err);
+              return successCallback(app, cache);
+            }
+
+            // put the html back into the correct object (the cached copy)
             // since async will give us the items in the correct order, we can
-            // can use the index to put the HTML content back into the cached item
-            _.chain(items).toArray().each(function (content_md, index) {
-              cacheBlogItemArray[index].content_html = markdown.convert(content_md);
+            // can use the arrat index.
+            _(htmlItems).each(function (content_html, index) {
+              cacheBlogItemArray[index].content_html = content_html;
             });
 
             lastGet = new Date();
             successCallback(app, body);
-          }
+          }); 
+
         });
       } else {
         console.log("LOG: failed to get gists from github. Using cache.");
@@ -120,6 +145,7 @@ var Posts = function () {
       id: gist.id,
       description: gist.description, 
       created_at: new Date(gist.created_at),
+      updated_at: new Date(gist.updated_at),
       url: 'https://gist.github.com/' + gist.id,
       commentsSummaryText: gist.comments > 0 ? gist.comments + ' comments' : 'no comments yet', 
       content_html: gist.content_html,
