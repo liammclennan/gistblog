@@ -15,7 +15,8 @@
     "should": "*",
     "request": "*",
     "node-markdown": "*",
-    "async": "*"
+    "async": "*",
+    "marked": "*"
   },
   "devDependencies": {},
   "optionalDependencies": {},

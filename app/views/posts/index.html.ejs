@@ -1,7 +1,7 @@
 <% for (var i = 0; i < gists.length; i++) { var gist = gists[i]; %>
 
 <div class="page-header well">
-	<h1><a href=<%= gist.url %>><%= gist.description %></a></h1> 
+	<h1><a name="<%= gist.id%>" href=<%= gist.url %>><%= gist.description %></a></h1> 
 	<span class="muted">
 		<i class="icon-time"></i>
 		<%= gist.created_at.toDateString() %>

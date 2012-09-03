@@ -117,7 +117,7 @@ var Posts = function () {
 
             // put the html back into the correct object (the cached copy)
             // since async will give us the items in the correct order, we can
-            // can use the arrat index.
+            // can use the array index.
             _(htmlItems).each(function (content_html, index) {
               cacheBlogItemArray[index].content_html = content_html;
             });
